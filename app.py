@@ -76,7 +76,6 @@ def split_bucket(directory_index, bucket_index, added_number):
     new_bucket = [local_depth] + [0] + [0] * st.session_state['elements_per_bucket']
     st.session_state['buckets'].append(new_bucket)
 
-    print(f"Local: {local_depth}, Global: {st.session_state['p_global']}")
     # Testar se a profundidade local excede p_global
     if local_depth > st.session_state['p_global']:
         # Aumenta a profundidade global
@@ -186,6 +185,5 @@ else:
     with col2:
         st.subheader('Buckets')
         st.table(get_buckets())
-        "Elementos por cesto: ", st.session_state['elements_per_bucket']
         st.session_state['buckets']
 
