@@ -81,7 +81,7 @@ def insert_number(added_number):
 
     # Calcula o índice do diretório usando um hash simples
     directory_index = added_number % (2 ** st.session_state['p_global'])
-    log_step(f"Cálcular índice: `{added_number} % {2 ** st.session_state['p_global']} = {directory_index}`")
+    log_step(f"Calcular índice: `{added_number} % {2 ** st.session_state['p_global']} = {directory_index}`")
 
     # Obtém o bucket correspondente
     bucket_index = st.session_state['directory'][directory_index]
@@ -108,7 +108,7 @@ def split_bucket(directory_index, bucket_index, added_number):
     # Separar o bucket original
     original_bucket = st.session_state['buckets'][bucket_index]
 
-    log_step(f"Atualizar profundidade Local (p') do Bucket {bucket_index}: `{original_bucket[0]} -> {local_depth}`")
+    log_step(f"Atualizar profundidade local (p') do Bucket {bucket_index}: `{original_bucket[0]} -> {local_depth}`")
     # Esvaziar primeiro bucket
     empty_bucket = [local_depth] + [0] + [0] * st.session_state['elements_per_bucket']
     st.session_state['buckets'][bucket_index] = empty_bucket
@@ -191,7 +191,7 @@ st.title("Tabela Hash Extensível")
 if st.session_state['config']:
     st.markdown("""
     A **Tabela Hash Extensível** é uma estrutura dinâmica utilizada para resolver colisões em tabelas hash de maneira eficiente.  
-    Ela se baseia no uso de **buckets** (ou cestos), onde os dados são armazenados, e em um **diretório**, que funciona como um mapeamento entre os endereços de hash e os buckets reais.
+    Ela se baseia no uso de **buckets** (ou cestos), onde os dados são armazenados, e de um **diretório**, que funciona como um mapeamento entre os endereços de hash e os buckets reais.
 
     Diferente das tabelas hash convencionais com tamanho fixo, a tabela extensível **cresce ou se reorganiza automaticamente** conforme a quantidade de dados aumenta, mantendo um bom desempenho nas operações de inserção, busca e remoção.
 
@@ -243,6 +243,7 @@ else:
             format="%d"
         )
         if st.button("Pesquisar"):
+            st.session_state['insertion_steps'] = [] # resetar os passos da inserção
             result = search_number(searched_number)
             highlight = result[:3]      # (bucket_index, col_name, status)
             highlight_dir = result[3]   # directory_index
@@ -256,7 +257,6 @@ else:
                 result_text = f"O número **{searched_number}** não foi encontrado no Bucket `{result[0]}`. ❌"
 
             search_steps = f"""
-            #### 🔍 Passo a Passo da Busca:
             1. **Procurar {searched_number}**
             2. Calcular índice: `{searched_number} % {modulo_base} = {highlight_dir}`
             3. Acessar: `diretório[{highlight_dir}] = {bucket_value}`
@@ -264,6 +264,14 @@ else:
             
             {result_text}
             """
+
+    # Slider e botão para facilitar testes
+    test_max_number = st.slider("Preencher a Tabela Hash Extensível com os valores do intervalo", 1, 99)
+    if st.button(f"Preencher 1 - {test_max_number}"):
+            for i in range(1,test_max_number + 1):
+                st.session_state['insertion_steps'] = []
+                insert_number(i)
+                st.session_state['insertion_steps'] = []
 
     # Mostrando tabelas lado a lado
     col1, col2, col_log = st.columns([2, max(5, st.session_state['elements_per_bucket']),3])
@@ -276,25 +284,19 @@ else:
     with col2:
         st.subheader('Buckets')
         st.table(get_buckets(highlight))
-        st.session_state['buckets']
 
     with col_log:
             if search_steps:
-                st.markdown(search_steps)
+                with st.expander("#### 🔍 Passo a Passo da Busca", expanded=True):
+                    st.markdown(search_steps)
             if 'insertion_steps' in st.session_state:
                 inserir_achados = 0
-                with st.expander("#### 📋 Passo a passo da Inserção", expanded=True):
+                with st.expander("#### 📋 Passo a Passo da Inserção", expanded=True):
                     for i, step in enumerate(st.session_state['insertion_steps'][0:]):  # pula o título
                         if step.find('📥') != -1: # determinar se escrito é do tipo (inseriondo numero x)
                             st.markdown(f"##### {step}")
                             inserir_achados+=1
                         else:
                             st.markdown(f"{i+1-inserir_achados}. {step}")
-    # BOTAO PARA FACILITAR TESTES
-    if st.button("Preencher 1 - 14"):
-            for i in range(1,15):
-                st.session_state['insertion_steps'] = []
-                insert_number(i)
-                st.session_state['insertion_steps'] = []
                 
 

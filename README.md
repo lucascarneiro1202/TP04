@@ -48,7 +48,7 @@ Para esse projeto, acabei focando na parte de pesquisa da tabela hash, implement
 ## Lucas
 
 <div align="justify">
-
+Nesse projeto, tive a oportunidade de utilizar pela primeira vez uma biblioteca Python para a criação de uma página web interativa. Foi uma experiência enriquecedora, haja vista que não conhecia esse tipo de ferramenta. O maior desafio foi representar uma estrutura de dados complexa como a Tabela Hash Extensível em uma página web, então superá-lo foi uma ótima oportunidade de aprendizado.
 </div>
 
 ## João
