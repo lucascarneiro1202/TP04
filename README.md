@@ -1,43 +1,64 @@
-# Windows
+# 📺 TP4 - Visualização
 
-## Criar o ambiente virtual de bibliotecas
+O projeto TP4 - Visualização é uma aplicação web para simular uma estrutura de *Tabela Hash Extensível*, utilizada em nossas aulas de AED3, com o intuito de ajudar os futuros alunos dessa disciplina. Para esse projeto, utilizamos python para manipulação da estrutura e, junto com a biblioteca Streamlit, a parte de visualização web.
 
-python -m venv venv
+Sobre o nosso grupo: [Membros!](#✒️-Autores)
 
-## Ativar o ambiente virtual
+# ‼️ Checklist
 
-venv\Scripts\activate
++ A visualização interativa da Tabela Hash Extensível foi criada? ✅
++ Há um vídeo de até 2 minutos demonstrando o uso da visualização? ✅
++ O trabalho está funcionando corretamente? ✅
++ O trabalho está completo? ✅
++ O trabalho é original e não a cópia de um trabalho de um colega? ✅
 
-## Baixar a biblioteca Streamlit
 
-pip install streamlit
+# 📦 Tutorial de instalação
 
-## Validar a instalação com o "Hello World"
+## Windows
 
-streamlit hello
++ Criar o ambiente virtual de bibliotecas
+`python -m venv venv`
++ Ativar o ambiente virtual
+`venv\Scripts\activate`
++ Baixar a biblioteca Streamlit
+`pip install streamlit`
++ Rodar a aplicação com o comando
+`streamlit run app.py`
 
-## Rodar a aplicação com o comando
+## MacOS/Linux
 
-streamlit run app.py
++ Criar o ambiente virtual de bibliotecas
+`python3 -m venv venv`
++ Ativar o ambiente virtual
+`source venv/bin/activate`
++ Baixar a biblioteca Streamlit
+`pip install streamlit`
++ Rodar a aplicação com o comando
+`streamlit run app.py`
 
-# MacOS/Linux
+# Experiências Individuais
 
-## Criar o ambiente virtual de bibliotecas
+## Augusto
 
-python3 -m venv venv
+<div align="justify">
+Para esse projeto, acabei focando na parte de pesquisa da tabela hash, implementando essa função na estrutura de dados e sua visualização. Foi uma ótima experiência trabalhar com novas ferramentas como a Streamlit.
+</div>
 
-## Ativar o ambiente virtual
+## Lucas
 
-source venv/bin/activate 
+<div align="justify">
 
-## Baixar a biblioteca Streamlit
+</div>
 
-pip install streamlit
+## João
 
-## Validar a instalação com o "Hello World"
+<div align="justify">
 
-streamlit hello
+</div>
 
-## Rodar a aplicação com o comando
 
-streamlit run app.py
+# ✒️ Autores
++ *Augusto Stambassi Duarte* 👨‍💻 - [Git Pessoal](https://github.com/stambassi)
++ *Lucas Carneiro Nassau Malta* 👨‍💻 - [Git Pessoal](https://github.com/lucascarneiro1202)
++ *João Pedro Torres* 👨‍💻 - [Git Pessoal](https://github.com/Towers444)
