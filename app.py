@@ -22,10 +22,20 @@ def standard_buckets_values():
 
 # --- Funções para montar DataFrames para visualização --- #
 
-def get_directory() -> pd.DataFrame:
-    return pd.DataFrame(st.session_state['directory'])
+def get_directory(highlight_index=None) -> pd.DataFrame:
+    df = pd.DataFrame(st.session_state['directory'], columns=['Bucket'])
 
-def get_buckets() -> pd.DataFrame:
+    if highlight_index is not None:
+        def highlight(cell):
+            styles = pd.DataFrame('', index=df.index, columns=df.columns)
+            if 0 <= highlight_index < len(df):
+                styles.loc[highlight_index, 'Bucket'] = 'background-color: green'
+            return styles
+        return df.style.apply(highlight, axis=None)
+
+    return df
+
+def get_buckets(highlight_info=None) -> pd.DataFrame:
     # Para cada bucket, monta um dicionário com p' e os valores
     bucket_data = []
     for bucket in st.session_state['buckets']:
@@ -36,10 +46,32 @@ def get_buckets() -> pd.DataFrame:
             bucket_dict[f'Valor {j + 1}'] = bucket[j + 2] 
         for j in range(bucket[1], st.session_state['elements_per_bucket']):
             bucket_dict[f'Valor {j + 1}'] = 'X'
-            print(bucket_dict[f'Valor {j + 1}'])
+            # print(bucket_dict[f'Valor {j + 1}'])
         bucket_data.append(bucket_dict)
 
     df = pd.DataFrame(bucket_data)
+
+    if highlight_info:
+        row_idx, col_name, status = highlight_info
+
+        def highlight(cell):
+            # Retorna um DataFrame com os estilos
+            styles = pd.DataFrame('', index=df.index, columns=df.columns)
+
+            if status == 'found': 
+                if col_name in df.columns and 0 <= row_idx < len(df):
+                    styles.loc[row_idx, col_name] = 'background-color: green'
+            elif status == 'not found' and 0 <= row_idx < len(df):
+                # Marca todas as colunas Valor 1 até Valor n em vermelho
+                for j in range(st.session_state['elements_per_bucket']):
+                    col = f'Valor {j + 1}'
+                    if col in df.columns:
+                        styles.loc[row_idx, col] = 'background-color: red'
+
+            return styles
+
+        return df.style.apply(highlight, axis=None)
+
     return df
 
 # --- Funções para inserir e remover elementos da Tabela Hash Extensível --- #
@@ -97,6 +129,26 @@ def split_bucket(directory_index, bucket_index, added_number):
 def remove_number(removed_number):
     pass
 
+
+# --- Funções para pesquisar na tabela Hash Extensível --- #
+
+def search_number (searched_number):
+     # Calcula o índice do diretório usando um hash simples
+    directory_index = searched_number % (2 ** st.session_state['p_global'])
+
+    # Obtém o bucket correspondente
+    bucket_index = st.session_state['directory'][directory_index]
+    bucket = st.session_state['buckets'][bucket_index]
+
+    # Verifica se o número pesquisado está no bucket
+    bucket_length = bucket[1]
+
+    for col, number in enumerate(bucket[2:bucket_length + 2]):
+        if number == searched_number:
+            return bucket_index, f'Valor {col+1}', 'found' , directory_index
+
+    return bucket_index, None, 'not found', directory_index
+
 # --- Inicialização das variáveis do session_state (somente se ainda não existirem) --- #
 
 if 'p_global' not in st.session_state:
@@ -152,7 +204,7 @@ if st.session_state['config']:
 
 else:
     # Input para adicionar número 
-    col_insert, col_remove = st.columns([1, 1])
+    col_insert, col_search, col_search_steps = st.columns([1, 1, 1])
 
     with col_insert:
         added_number = st.number_input(
@@ -164,15 +216,42 @@ else:
         if st.button("Adicionar"):
             insert_number(added_number)
 
-    with col_remove:
-        removed_number = st.number_input(
-            label="Número a ser removido",
-            step=1,
-            format="%d",
-        )
+    highlight = None
+    highlight_dir = None
+    search_steps = ""
 
-        if st.button("Remover"):
-            insert_number(removed_number)
+    with col_search:
+        searched_number = st.number_input(
+            label="Número a ser pesquisado", 
+            step=1, 
+            format="%d"
+        )
+        if st.button("Pesquisar"):
+            result = search_number(searched_number)
+            highlight = result[:3]      # (bucket_index, col_name, status)
+            highlight_dir = result[3]   # directory_index
+
+            modulo_base = 2 ** st.session_state['p_global']
+            bucket_value = st.session_state['directory'][highlight_dir]
+
+            if highlight[2] == 'found':
+                result_text = f"O número **{searched_number}** foi encontrado no Bucket `{result[0]}` na coluna `{result[1]}`. ✅"
+            else:
+                result_text = f"O número **{searched_number}** não foi encontrado no Bucket `{result[0]}`. ❌"
+
+            search_steps = f"""
+            #### 🔍 Passo a Passo da Busca:
+            1. **Procurar {searched_number}**
+            2. Calcular índice: `{searched_number} % {modulo_base} = {highlight_dir}`
+            3. Acessar: `diretório[{highlight_dir}] = {bucket_value}`
+            4. Verificar o bucket `{bucket_value}`
+            
+            {result_text}
+            """
+
+    with col_search_steps:
+        if search_steps:
+            st.markdown(search_steps)
 
     # Mostrando tabelas lado a lado
     col1, spacer, col2 = st.columns([3, 0.5, max(5, st.session_state['elements_per_bucket'])])
@@ -180,10 +259,15 @@ else:
     with col1:
         p_global = st.session_state['p_global']
         st.subheader(f'Diretório (p = {p_global})')
-        st.table(get_directory())
+        st.table(get_directory(highlight_dir))
 
     with col2:
         st.subheader('Buckets')
-        st.table(get_buckets())
+        st.table(get_buckets(highlight))
         st.session_state['buckets']
+
+    # BOTAO PARA FACILITAR TESTES
+    if st.button("Preencher 1 - 14"):
+            for i in range(1,15):
+                insert_number(i)
 
