@@ -4,6 +4,9 @@ O projeto TP4 - Visualização é uma aplicação web para simular uma estrutura
 
 Sobre o nosso grupo: [Membros!](#✒️-Autores)
 
+
+[![Watch the video](https://img.youtube.com/vi/-H7BfDKnTH4/maxresdefault.jpg)](https://youtu.be/-H7BfDKnTH4)
+
 # ‼️ Checklist
 
 + A visualização interativa da Tabela Hash Extensível foi criada? ✅
@@ -42,7 +45,7 @@ Sobre o nosso grupo: [Membros!](#✒️-Autores)
 ## Augusto
 
 <div align="justify">
-Para esse projeto, acabei focando na parte de pesquisa da tabela hash, implementando essa função na estrutura de dados e sua visualização. Foi uma ótima experiência trabalhar com novas ferramentas como a Streamlit.
+Para esse projeto, acabei focando na parte de pesquisa da tabela hash, implementando essa função na estrutura de dados e sua visualização.Além disso, criei os "passo a passo" de ambas as funções da Tabela Hash. Foi uma ótima experiência trabalhar com novas ferramentas como a Streamlit.
 </div>
 
 ## Lucas
@@ -52,13 +55,14 @@ Nesse projeto, tive a oportunidade de utilizar pela primeira vez uma biblioteca 
 </div>
 
 ## João
-
 <div align="justify">
-
+Fiquei responsável por pesquisar bibliotecas de visualização para o projeto. Avaliei opções como Dash, Plotly e Bokeh, mas optamos pelo Streamlit por sua simplicidade e boa integração com Python. Essa pesquisa foi importante para garantir uma visualização clara da estrutura e me ajudou a conhecer melhor ferramentas úteis no ensino de estruturas de dados.
 </div>
-
 
 # ✒️ Autores
 + *Augusto Stambassi Duarte* 👨‍💻 - [Git Pessoal](https://github.com/stambassi)
 + *Lucas Carneiro Nassau Malta* 👨‍💻 - [Git Pessoal](https://github.com/lucascarneiro1202)
 + *João Pedro Torres* 👨‍💻 - [Git Pessoal](https://github.com/Towers444)
+
+
+
