@@ -77,29 +77,38 @@ def get_buckets(highlight_info=None) -> pd.DataFrame:
 # --- Funções para inserir e remover elementos da Tabela Hash Extensível --- #
 
 def insert_number(added_number):
+    log_step(f"📥 Inserir número: **{added_number}**")  
+
     # Calcula o índice do diretório usando um hash simples
     directory_index = added_number % (2 ** st.session_state['p_global'])
+    log_step(f"Cálcular índice: `{added_number} % {2 ** st.session_state['p_global']} = {directory_index}`")
 
     # Obtém o bucket correspondente
     bucket_index = st.session_state['directory'][directory_index]
-    bucket = st.session_state['buckets'][bucket_index]
+    log_step(f"Acessar: `Diretório[{directory_index}] -> Bucket[{bucket_index}]`")
 
+    bucket = st.session_state['buckets'][bucket_index]
+    
     # Verifica se há espaço disponível no bucket
     if bucket[1] < st.session_state['elements_per_bucket']:
         # Insere o número 
         bucket[1] += 1
         bucket[ bucket[1] + 1 ] = added_number 
+        log_step(f"✅ Espaço encontrado no Bucket {bucket_index}. Inserido na posição {bucket[1]}")
     else:
         # Se o bucket está cheio, realiza a divisão
+        log_step(f"❌ Bucket {bucket_index} está cheio. Iniciando split...")
         split_bucket(directory_index, bucket_index, added_number)
 
 def split_bucket(directory_index, bucket_index, added_number):
     # Obtém profundidade local do bucket e incrementa
+    
     local_depth = st.session_state['buckets'][bucket_index][0] + 1
 
     # Separar o bucket original
     original_bucket = st.session_state['buckets'][bucket_index]
 
+    log_step(f"Atualizar profundidade Local (p') do Bucket {bucket_index}: `{original_bucket[0]} -> {local_depth}`")
     # Esvaziar primeiro bucket
     empty_bucket = [local_depth] + [0] + [0] * st.session_state['elements_per_bucket']
     st.session_state['buckets'][bucket_index] = empty_bucket
@@ -116,9 +125,11 @@ def split_bucket(directory_index, bucket_index, added_number):
         st.session_state['directory'] *= 2
         # Atualizar o endereço do diretório
         st.session_state['directory'][added_number % (2 ** st.session_state['p_global'])] = len(st.session_state['buckets']) - 1
+        log_step(f"Profundidade global aumentada para {st.session_state['p_global']}. Diretório duplicado.")
     else:
         st.session_state['directory'][directory_index] = len(st.session_state['buckets']) - 1
 
+    log_step(f"🔄 Reinserir `{original_bucket[2:len(original_bucket)]}` e depois `{added_number}`")
     # Inserir novamente os valores do bucket original
     for i in range(2, len(original_bucket)):
         insert_number(original_bucket[i])
@@ -126,8 +137,12 @@ def split_bucket(directory_index, bucket_index, added_number):
     # Inserir o valor incialmente pretendido
     insert_number(added_number)
 
-def remove_number(removed_number):
-    pass
+
+def log_step(text):
+    if 'insertion_steps' not in st.session_state:
+        st.session_state['insertion_steps'] = []
+    st.session_state['insertion_steps'].append(text)
+
 
 
 # --- Funções para pesquisar na tabela Hash Extensível --- #
@@ -204,7 +219,7 @@ if st.session_state['config']:
 
 else:
     # Input para adicionar número 
-    col_insert, col_search, col_search_steps = st.columns([1, 1, 1])
+    col_insert, col_search, col_log = st.columns([1, 1, 1])
 
     with col_insert:
         added_number = st.number_input(
@@ -214,6 +229,7 @@ else:
         )
 
         if st.button("Adicionar"):
+            st.session_state['insertion_steps'] = [] # resetar os passos da inserção
             insert_number(added_number)
 
     highlight = None
@@ -249,12 +265,8 @@ else:
             {result_text}
             """
 
-    with col_search_steps:
-        if search_steps:
-            st.markdown(search_steps)
-
     # Mostrando tabelas lado a lado
-    col1, spacer, col2 = st.columns([3, 0.5, max(5, st.session_state['elements_per_bucket'])])
+    col1, col2, col_log = st.columns([2, max(5, st.session_state['elements_per_bucket']),3])
 
     with col1:
         p_global = st.session_state['p_global']
@@ -266,8 +278,23 @@ else:
         st.table(get_buckets(highlight))
         st.session_state['buckets']
 
+    with col_log:
+            if search_steps:
+                st.markdown(search_steps)
+            if 'insertion_steps' in st.session_state:
+                inserir_achados = 0
+                with st.expander("#### 📋 Passo a passo da Inserção", expanded=True):
+                    for i, step in enumerate(st.session_state['insertion_steps'][0:]):  # pula o título
+                        if step.find('📥') != -1: # determinar se escrito é do tipo (inseriondo numero x)
+                            st.markdown(f"##### {step}")
+                            inserir_achados+=1
+                        else:
+                            st.markdown(f"{i+1-inserir_achados}. {step}")
     # BOTAO PARA FACILITAR TESTES
     if st.button("Preencher 1 - 14"):
             for i in range(1,15):
+                st.session_state['insertion_steps'] = []
                 insert_number(i)
+                st.session_state['insertion_steps'] = []
+                
 
